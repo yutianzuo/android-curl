@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/get"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="GET"
+        android:textAlignment="center"
+        />
+
+    <Button
+        android:id="@+id/postform"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="POST_FORM"
+        android:textAlignment="center"
+        />
+
+    <Button
+        android:id="@+id/postjson"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="POST_JSON"
+        android:textAlignment="center"
+        />
+
+    <Button
+        android:id="@+id/put"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="PUT"
+        android:textAlignment="center"
+        />
+
+    <Button
+        android:id="@+id/postfile"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="POST_FILE"
+        android:textAlignment="center"
+        />
+
+    <Button
+        android:id="@+id/download"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="DOWNLOAD"
+        android:textAlignment="center"
+        />
+
+
+    <TextView
+        android:id="@+id/txt_info"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:textSize="16sp"/>
+
+</LinearLayout>
