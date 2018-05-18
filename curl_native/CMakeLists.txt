@@ -46,7 +46,8 @@ set_target_properties( # Specifies the target library.
         PROPERTIES IMPORTED_LOCATION
 
         # Provides the path to the library you want to import.
-        ../../../../src/main/cpp/lib/libssl.a)
+        #../../../../src/main/cpp/lib/libssl.a)
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libssl.a)
 
 add_library(libcrypto
         STATIC
@@ -58,7 +59,8 @@ set_target_properties( # Specifies the target library.
         PROPERTIES IMPORTED_LOCATION
 
         # Provides the path to the library you want to import.
-        ../../../../src/main/cpp/lib/libcrypto.a)
+        #../../../../src/main/cpp/lib/libcrypto.a)
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcrypto.a)
 
 
 add_library(libcurl
@@ -72,7 +74,7 @@ set_target_properties( # Specifies the target library.
         PROPERTIES IMPORTED_LOCATION
 
         # Provides the path to the library you want to import.
-        ../../../../src/main/cpp/lib/libcurl.a)
+        ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcurl.a)
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
