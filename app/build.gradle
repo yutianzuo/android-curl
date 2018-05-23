@@ -5,7 +5,7 @@ android {
         SignConfig {
             keyAlias 'key0'
             keyPassword '123456'
-            storeFile file('/Users/yutianzuo/code/github/android_curl/app/key.keystore')
+            storeFile file('key.keystore')
             storePassword '123456'
         }
     }

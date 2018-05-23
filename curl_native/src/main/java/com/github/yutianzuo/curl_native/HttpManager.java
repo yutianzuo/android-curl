@@ -48,6 +48,7 @@ public enum HttpManager {
     public void callBack(int type, final String strResponse, final float persent, int seq, final int errcode) {
         //Log.e("JAVA_TAG", strResponse);
         final HttpCallback callback = mCallbackMap.get(seq);
+        final String strResponse_safe = strResponse == null ? "" : strResponse;
         if (callback != null) {
             if (type == RESULT_FAILED) {
                 ThreadHelper.runOnUiThread(new Runnable() {
@@ -69,7 +70,7 @@ public enum HttpManager {
                     ThreadHelper.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            callback.success(strResponse);
+                            callback.success(strResponse_safe);
                         }
                     });
                 }

@@ -26,7 +26,12 @@ static void GlobalCallBackFunc(int result, const std::string &respones, float pe
     if (env && g_obj) {
         jclass clazz = env->GetObjectClass(g_obj);
         jmethodID method = env->GetMethodID(clazz, "callBack", "(ILjava/lang/String;FII)V");
-        jstring jrespones = env->NewStringUTF(respones.c_str());
+        jstring jrespones = nullptr;
+        try {
+            jrespones = env->NewStringUTF(respones.c_str());
+        } catch (...) {
+
+        }
         env->CallVoidMethod(g_obj, method, result, jrespones, persent, seq, errcode);
     }
 
@@ -41,7 +46,8 @@ static void GlobalCallBackFunc(int result, const std::string &respones, float pe
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_init(JNIEnv *env, jclass type, jint threadPoolSize, jobject callBack) {
+Java_com_github_yutianzuo_curl_1native_JniCurl_init(JNIEnv *env, jclass type, jint threadPoolSize,
+                                                    jobject callBack) {
     HttpManager::init(threadPoolSize);
     if (callBack) {
         if (g_obj) {
@@ -63,53 +69,106 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_unInit(JNIEnv *env, jclass type) 
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_addBasicHeader(JNIEnv *env, jclass type, jstring strHash_,
+Java_com_github_yutianzuo_curl_1native_JniCurl_addBasicHeader(JNIEnv *env, jclass type,
+                                                              jstring strHash_,
                                                               jstring strKey_, jstring strValue_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strKey = env->GetStringUTFChars(strKey_, 0);
-    const char *strValue = env->GetStringUTFChars(strValue_, 0);
+    const char *strHash = nullptr;
+    const char *strKey = nullptr;
+    const char *strValue = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strKey_) {
+        strKey = env->GetStringUTFChars(strKey_, 0);
+    }
+
+    if (strValue_) {
+        strValue = env->GetStringUTFChars(strValue_, 0);
+    }
+
 
     if (strHash && strKey && strValue) {
         RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
         p->add_basic_headers(strKey, strValue);
     }
-
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strKey_, strKey);
-    env->ReleaseStringUTFChars(strValue_, strValue);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strKey_ && strKey) {
+        env->ReleaseStringUTFChars(strKey_, strKey);
+    }
+    if (strValue_ && strValue) {
+        env->ReleaseStringUTFChars(strValue_, strValue);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_addBasicURLParam(JNIEnv *env, jclass type, jstring strHash_,
-                                                                jstring strKey_, jstring strValue_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strKey = env->GetStringUTFChars(strKey_, 0);
-    const char *strValue = env->GetStringUTFChars(strValue_, 0);
+Java_com_github_yutianzuo_curl_1native_JniCurl_addBasicURLParam(JNIEnv *env, jclass type,
+                                                                jstring strHash_,
+                                                                jstring strKey_,
+                                                                jstring strValue_) {
+    const char *strHash = nullptr;
+    const char *strKey = nullptr;
+    const char *strValue = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strKey_) {
+        strKey = env->GetStringUTFChars(strKey_, 0);
+    }
+
+    if (strValue_) {
+        strValue = env->GetStringUTFChars(strValue_, 0);
+    }
 
     if (strHash && strKey && strValue) {
         RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
         p->add_basic_url_params(strKey, strValue);
     }
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strKey_, strKey);
-    env->ReleaseStringUTFChars(strValue_, strValue);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strKey_ && strKey) {
+        env->ReleaseStringUTFChars(strKey_, strKey);
+    }
+    if (strValue_ && strValue) {
+        env->ReleaseStringUTFChars(strValue_, strValue);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_setHost(JNIEnv *env, jclass type, jstring strHash_, jstring strHost_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strHost = env->GetStringUTFChars(strHost_, 0);
+Java_com_github_yutianzuo_curl_1native_JniCurl_setHost(JNIEnv *env, jclass type, jstring strHash_,
+                                                       jstring strHost_) {
+
+    const char *strHash = nullptr;
+    const char *strHost = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strHost_) {
+        strHost = env->GetStringUTFChars(strHost_, 0);
+    }
 
     if (strHash && strHost) {
         RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
         p->set_host(strHost);
     }
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strHost_, strHost);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strHost_ && strHost) {
+        env->ReleaseStringUTFChars(strHost_, strHost);
+    }
 }
 
 using JNIMAP = std::map<std::string, std::string>;
@@ -128,13 +187,17 @@ static JNIMAP gen_map(JNIEnv *env, jobject headers_keys, jobject headers_values)
                                                              "(I)Ljava/lang/Object;");
             jmethodID arraylist_value_size = env->GetMethodID(cls_list_value, "size", "()I");
 
-            if (arraylist_key_get && arraylist_key_size && arraylist_value_get && arraylist_value_size) {
+            if (arraylist_key_get && arraylist_key_size && arraylist_value_get &&
+                arraylist_value_size) {
                 jint len_key = env->CallIntMethod(headers_keys, arraylist_key_size);
                 jint len_value = env->CallIntMethod(headers_values, arraylist_value_size);
                 if (len_key > 0 && len_key == len_value) {
                     for (int i = 0; i < len_key; ++i) {
-                        jstring jstr_key = (jstring) env->CallObjectMethod(headers_keys, arraylist_key_get, i);
-                        jstring jstr_value = (jstring) env->CallObjectMethod(headers_values, arraylist_value_get, i);
+                        jstring jstr_key = (jstring) env->CallObjectMethod(headers_keys,
+                                                                           arraylist_key_get, i);
+                        jstring jstr_value = (jstring) env->CallObjectMethod(headers_values,
+                                                                             arraylist_value_get,
+                                                                             i);
                         if (jstr_key && jstr_value) {
                             const char *sz_key = (char *) env->GetStringUTFChars(jstr_key,
                                                                                  NULL);
@@ -159,11 +222,22 @@ static JNIMAP gen_map(JNIEnv *env, jobject headers_keys, jobject headers_values)
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_get(JNIEnv *env, jclass type, jstring strHash_, jint requestSeq,
-                                                   jstring strPath_, jobject headers_keys, jobject headers_values,
+Java_com_github_yutianzuo_curl_1native_JniCurl_get(JNIEnv *env, jclass type, jstring strHash_,
+                                                   jint requestSeq,
+                                                   jstring strPath_, jobject headers_keys,
+                                                   jobject headers_values,
                                                    jobject params_keys, jobject params_values) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strPath = env->GetStringUTFChars(strPath_, 0);
+
+    const char *strHash = nullptr;
+    const char *strPath = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strPath_) {
+        strPath = env->GetStringUTFChars(strPath_, 0);
+    }
 
     if (strHash && strPath) {
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
@@ -172,48 +246,92 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_get(JNIEnv *env, jclass type, jst
         p->get(strPath, inner_headers, inner_url_params, GlobalCallBackFunc, requestSeq);
     }
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strPath_, strPath);
+
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strPath_ && strPath) {
+        env->ReleaseStringUTFChars(strPath_, strPath);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_setCertPath(JNIEnv *env, jclass type, jstring strHash_,
+Java_com_github_yutianzuo_curl_1native_JniCurl_setCertPath(JNIEnv *env, jclass type,
+                                                           jstring strHash_,
                                                            jstring strCertPath_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strCertPath = env->GetStringUTFChars(strCertPath_, 0);
+
+    const char *strHash = nullptr;
+    const char *strCertPath = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strCertPath_) {
+        strCertPath = env->GetStringUTFChars(strCertPath_, 0);
+    }
 
     if (strHash && strCertPath) {
         RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
         p->set_cert_path(strCertPath);
     }
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strCertPath_, strCertPath);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strCertPath_ && strCertPath) {
+        env->ReleaseStringUTFChars(strCertPath_, strCertPath);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_setProxy(JNIEnv *env, jclass type, jstring strHash_, jstring proxy_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *proxy = env->GetStringUTFChars(proxy_, 0);
+Java_com_github_yutianzuo_curl_1native_JniCurl_setProxy(JNIEnv *env, jclass type, jstring strHash_,
+                                                        jstring proxy_) {
+    const char *strHash = nullptr;
+    const char *proxy = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (proxy_) {
+        proxy = env->GetStringUTFChars(proxy_, 0);
+    }
 
     if (strHash && proxy) {
         RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
         p->set_proxy_path(proxy);
     }
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(proxy_, proxy);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (proxy_ && proxy) {
+        env->ReleaseStringUTFChars(proxy_, proxy);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_postFromData(JNIEnv *env, jclass type, jstring strHash_, jint requestSeq,
-                                                    jstring strPath_, jobject headers_keys, jobject headers_values,
-                                                    jobject params_keys, jobject params_values) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strPath = env->GetStringUTFChars(strPath_, 0);
+Java_com_github_yutianzuo_curl_1native_JniCurl_postFromData(JNIEnv *env, jclass type,
+                                                            jstring strHash_, jint requestSeq,
+                                                            jstring strPath_, jobject headers_keys,
+                                                            jobject headers_values,
+                                                            jobject params_keys,
+                                                            jobject params_values) {
+    const char *strHash = nullptr;
+    const char *strPath = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strPath_) {
+        strPath = env->GetStringUTFChars(strPath_, 0);
+    }
+
 
     if (strHash && strPath) {
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
@@ -222,18 +340,36 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_postFromData(JNIEnv *env, jclass 
         p->post_form(strPath, inner_headers, inner_url_params, GlobalCallBackFunc, requestSeq);
     }
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strPath_, strPath);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strPath_ && strPath) {
+        env->ReleaseStringUTFChars(strPath_, strPath);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_postJson(JNIEnv *env, jclass type, jstring strHash_, jint requestSeq,
-                                                        jstring strPath_, jobject headers_keys, jobject headers_values,
+Java_com_github_yutianzuo_curl_1native_JniCurl_postJson(JNIEnv *env, jclass type, jstring strHash_,
+                                                        jint requestSeq,
+                                                        jstring strPath_, jobject headers_keys,
+                                                        jobject headers_values,
                                                         jstring strJson_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strPath = env->GetStringUTFChars(strPath_, 0);
-    const char *strJson = env->GetStringUTFChars(strJson_, 0);
+    const char *strJson = nullptr;
+    const char *strHash = nullptr;
+    const char *strPath = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strPath_) {
+        strPath = env->GetStringUTFChars(strPath_, 0);
+    }
+
+    if (strJson_) {
+        strJson = env->GetStringUTFChars(strJson_, 0);
+    }
 
     std::string str_json;
     if (strJson) {
@@ -247,19 +383,39 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_postJson(JNIEnv *env, jclass type
         p->post_json(strPath, inner_headers, str_json, GlobalCallBackFunc, requestSeq);
     }
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strPath_, strPath);
-    env->ReleaseStringUTFChars(strJson_, strJson);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strPath_ && strPath) {
+        env->ReleaseStringUTFChars(strPath_, strPath);
+    }
+    if (strJson_ && strJson) {
+        env->ReleaseStringUTFChars(strJson_, strJson);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_putJson(JNIEnv *env, jclass type, jstring strHash_, jint requestSeq,
-                                                       jstring strPath_, jobject headers_keys, jobject headers_values,
+Java_com_github_yutianzuo_curl_1native_JniCurl_putJson(JNIEnv *env, jclass type, jstring strHash_,
+                                                       jint requestSeq,
+                                                       jstring strPath_, jobject headers_keys,
+                                                       jobject headers_values,
                                                        jstring strJson_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strPath = env->GetStringUTFChars(strPath_, 0);
-    const char *strJson = env->GetStringUTFChars(strJson_, 0);
+    const char *strJson = nullptr;
+    const char *strHash = nullptr;
+    const char *strPath = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strPath_) {
+        strPath = env->GetStringUTFChars(strPath_, 0);
+    }
+
+    if (strJson_) {
+        strJson = env->GetStringUTFChars(strJson_, 0);
+    }
 
     std::string str_json;
     if (strJson) {
@@ -273,27 +429,69 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_putJson(JNIEnv *env, jclass type,
     }
 
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strPath_, strPath);
-    env->ReleaseStringUTFChars(strJson_, strJson);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strPath_ && strPath) {
+        env->ReleaseStringUTFChars(strPath_, strPath);
+    }
+    if (strJson_ && strJson) {
+        env->ReleaseStringUTFChars(strJson_, strJson);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_postFile(JNIEnv *env, jclass type, jstring strHash_, jint requestSeq,
-                                                        jstring strPath_, jobject headers_keys, jobject headers_values,
+Java_com_github_yutianzuo_curl_1native_JniCurl_postFile(JNIEnv *env, jclass type, jstring strHash_,
+                                                        jint requestSeq,
+                                                        jstring strPath_, jobject headers_keys,
+                                                        jobject headers_values,
                                                         jstring strFormName_, jobject params_keys,
-                                                        jobject params_values, jstring strJsonName_, jstring strJson_,
-                                                        jstring strFileKeyName_, jstring strFilePath_,
+                                                        jobject params_values, jstring strJsonName_,
+                                                        jstring strJson_,
+                                                        jstring strFileKeyName_,
+                                                        jstring strFilePath_,
                                                         jstring strFileName_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strPath = env->GetStringUTFChars(strPath_, 0);
-    const char *strFormName = env->GetStringUTFChars(strFormName_, 0);
-    const char *strJsonName = env->GetStringUTFChars(strJsonName_, 0);
-    const char *strJson = env->GetStringUTFChars(strJson_, 0);
-    const char *strFileKeyName = env->GetStringUTFChars(strFileKeyName_, 0);
-    const char *strFilePath = env->GetStringUTFChars(strFilePath_, 0);
+    const char *strHash = nullptr;
+    const char *strPath = nullptr;
+    const char *strFormName = nullptr;
+    const char *strJsonName = nullptr;
+    const char *strJson = nullptr;
+    const char *strFileKeyName = nullptr;
+    const char *strFilePath = nullptr;
     const char *strFileName = env->GetStringUTFChars(strFileName_, 0);
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strPath_) {
+        strPath = env->GetStringUTFChars(strPath_, 0);
+    }
+
+    if (strFormName_) {
+        strFormName = env->GetStringUTFChars(strFormName_, 0);
+    }
+
+    if (strJsonName_) {
+        strJsonName = env->GetStringUTFChars(strJsonName_, 0);
+    }
+
+    if (strFileKeyName_) {
+        strFileKeyName = env->GetStringUTFChars(strFileKeyName_, 0);
+    }
+
+    if (strFilePath_) {
+        strFilePath = env->GetStringUTFChars(strFilePath_, 0);
+    }
+
+    if (strJson_) {
+        strJson = env->GetStringUTFChars(strJson_, 0);
+    }
+
+    if (strFileName_) {
+        strFileName = env->GetStringUTFChars(strFileName_, 0);
+    }
 
     std::string str_formname;
     std::string str_jsonname;
@@ -325,30 +523,61 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_postFile(JNIEnv *env, jclass type
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
         JNIMAP inner_form_params = gen_map(env, params_keys, params_values);
         RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
-        p->post_file(strPath, inner_headers, str_formname, inner_form_params, str_jsonname, str_json,
+        p->post_file(strPath, inner_headers, str_formname, inner_form_params, str_jsonname,
+                     str_json,
                      str_filekeyname, str_filename, str_filepath, GlobalCallBackFunc,
                      requestSeq);
     }
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strPath_, strPath);
-    env->ReleaseStringUTFChars(strFormName_, strFormName);
-    env->ReleaseStringUTFChars(strJsonName_, strJsonName);
-    env->ReleaseStringUTFChars(strJson_, strJson);
-    env->ReleaseStringUTFChars(strFileKeyName_, strFileKeyName);
-    env->ReleaseStringUTFChars(strFilePath_, strFilePath);
-    env->ReleaseStringUTFChars(strFileName_, strFileName);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strPath_ && strPath) {
+        env->ReleaseStringUTFChars(strPath_, strPath);
+    }
+    if (strFormName_ && strFormName) {
+        env->ReleaseStringUTFChars(strFormName_, strFormName);
+    }
+    if (strJsonName_ && strJsonName) {
+        env->ReleaseStringUTFChars(strJsonName_, strJsonName);
+    }
+    if (strJson_ && strJson) {
+        env->ReleaseStringUTFChars(strJson_, strJson);
+    }
+    if (strFileKeyName_ && strFileKeyName) {
+        env->ReleaseStringUTFChars(strFileKeyName_, strFileKeyName);
+    }
+    if (strFilePath_ && strFilePath) {
+        env->ReleaseStringUTFChars(strFilePath_, strFilePath);
+    }
+    if (strFileName_ && strFileName) {
+        env->ReleaseStringUTFChars(strFileName_, strFileName);
+    }
 }
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_com_github_yutianzuo_curl_1native_JniCurl_download(JNIEnv *env, jclass type, jstring strHash_, jint requestSeq,
-                                                        jstring strPath_, jobject headers_keys, jobject headers_values,
+Java_com_github_yutianzuo_curl_1native_JniCurl_download(JNIEnv *env, jclass type, jstring strHash_,
+                                                        jint requestSeq,
+                                                        jstring strPath_, jobject headers_keys,
+                                                        jobject headers_values,
                                                         jobject params_keys, jobject params_values,
                                                         jstring strFilePath_) {
-    const char *strHash = env->GetStringUTFChars(strHash_, 0);
-    const char *strPath = env->GetStringUTFChars(strPath_, 0);
-    const char *strFilePath = env->GetStringUTFChars(strFilePath_, 0);
+    const char *strFilePath = nullptr;
+    const char *strHash = nullptr;
+    const char *strPath = nullptr;
+
+    if (strHash_) {
+        strHash = env->GetStringUTFChars(strHash_, 0);
+    }
+
+    if (strPath_) {
+        strPath = env->GetStringUTFChars(strPath_, 0);
+    }
+
+    if (strFilePath_) {
+        strFilePath = env->GetStringUTFChars(strFilePath_, 0);
+    }
 
     std::string str_filepath;
     if (strFilePath) {
@@ -359,11 +588,18 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_download(JNIEnv *env, jclass type
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
         JNIMAP inner_url_params = gen_map(env, params_keys, params_values);
         RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
-        p->download(strPath, inner_headers, inner_url_params, str_filepath, GlobalCallBackFunc, requestSeq);
+        p->download(strPath, inner_headers, inner_url_params, str_filepath, GlobalCallBackFunc,
+                    requestSeq);
     }
 
 
-    env->ReleaseStringUTFChars(strHash_, strHash);
-    env->ReleaseStringUTFChars(strPath_, strPath);
-    env->ReleaseStringUTFChars(strFilePath_, strFilePath);
+    if (strHash_ && strHash) {
+        env->ReleaseStringUTFChars(strHash_, strHash);
+    }
+    if (strPath_ && strPath) {
+        env->ReleaseStringUTFChars(strPath_, strPath);
+    }
+    if (strFilePath_ && strFilePath) {
+        env->ReleaseStringUTFChars(strFilePath_, strFilePath);
+    }
 }

@@ -27,6 +27,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             externalNativeBuild {
                 cmake {
+                    cppFlags "-std=c++11"
                     arguments "-DCMAKE_BUILD_TYPE=Release"
                 }
             }
@@ -35,6 +36,7 @@ android {
             debuggable false
             externalNativeBuild {
                 cmake {
+                    cppFlags "-std=c++11"
                     arguments "-DCMAKE_BUILD_TYPE=Debug"
                 }
             }
