@@ -13,12 +13,12 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-        externalNativeBuild {
-            cmake {
-                cppFlags "-std=c++11"
-                arguments "-DANDROID_ABI=armeabi-v7a"
-            }
-        }
+//        externalNativeBuild {
+//            cmake {
+//                cppFlags "-std=c++11"
+//                arguments "-DANDROID_ABI=armeabi-v7a"
+//            }
+//        }
         ndk {
             abiFilters 'armeabi-v7a'
         }

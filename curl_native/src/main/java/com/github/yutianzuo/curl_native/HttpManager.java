@@ -46,7 +46,7 @@ public enum HttpManager {
      * callback invoke in mainthread
      */
     public void callBack(int type, final String strResponse, final float persent, int seq, final int errcode) {
-        Log.e("JAVA_TAG", strResponse);
+        //Log.e("JAVA_TAG", strResponse);
         final HttpCallback callback = mCallbackMap.get(seq);
         if (callback != null) {
             if (type == RESULT_FAILED) {
