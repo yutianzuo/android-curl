@@ -1,6 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
+    signingConfigs {
+        SignConfig {
+            keyAlias 'key0'
+            keyPassword '123456'
+            storeFile file('/Users/yutianzuo/code/github/android_curl/app/key.keystore')
+            storePassword '123456'
+        }
+    }
     compileSdkVersion 27
     defaultConfig {
         applicationId "com.github.yutianzuo.myapplication"
@@ -12,11 +20,22 @@ android {
     }
     buildTypes {
         release {
-            minifyEnabled false
+            signingConfig signingConfigs.SignConfig
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+        debug {
+            signingConfig signingConfigs.SignConfig
+        }
     }
-
+    buildToolsVersion '27.0.3'
+    productFlavors {
+    }
+}
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
 }
 
 dependencies {
@@ -27,4 +46,5 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation project(':curl_native')
+    //implementation(name: 'curl_native-release', ext: 'aar')
 }
