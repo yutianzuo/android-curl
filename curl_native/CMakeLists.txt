@@ -16,7 +16,12 @@ INCLUDE_DIRECTORIES(../curl_native/src/main/cpp/include/curl)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")
 set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -march=armv7-a")
 
-add_definitions(-DENABLE_LOG)
+
+if (${CMAKE_BUILD_TYPE} MATCHES Debug)
+    add_definitions(-DENABLE_LOG)
+endif ()
+
+#add_definitions(-DENABLE_LOG)
 
 add_library( # Sets the name of the library.
         native_net
