@@ -115,6 +115,9 @@ public:
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEDATA, (void *) &m_buffer);
 
+//        m_headers = curl_slist_append(m_headers, "Accept: text/html;charset=UTF-8");
+//        m_headers = curl_slist_append(m_headers, "Accept-Charset: ISO-8859-1");
+
         (static_cast<Derive *>(this))->config_curl();
     }
 
