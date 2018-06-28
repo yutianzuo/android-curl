@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class RequestManager {
-    static public AtomicInteger gSeq = new AtomicInteger(0);
+    static private AtomicInteger gSeq = new AtomicInteger(0);
     private String seqHash; //this is actually native request_manager
 
     public RequestManager() {

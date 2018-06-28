@@ -11,7 +11,7 @@ android {
     }
     compileSdkVersion 27
     defaultConfig {
-        applicationId "com.github.yutianzuo.myapplication"
+        applicationId "com.github.yutianzuo.curl"
         minSdkVersion 20
         targetSdkVersion 20
         versionCode 1

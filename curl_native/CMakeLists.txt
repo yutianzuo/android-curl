@@ -11,6 +11,7 @@ cmake_minimum_required(VERSION 3.4.1)
 # Gradle automatically packages shared libraries with your APK.
 
 
+INCLUDE_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/main/cpp/include)
 INCLUDE_DIRECTORIES(../curl_native/src/main/cpp/include/curl)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -fPIC")

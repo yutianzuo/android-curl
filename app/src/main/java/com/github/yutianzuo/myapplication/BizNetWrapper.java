@@ -32,7 +32,7 @@ public enum BizNetWrapper {
     public RequestManager getBizRequestManager(Context context) {
         if (mRequest1 == null) {
             mRequest1 = HttpManager.INSTANCE.getRequest();
-            mRequest1.setHost("http://news.sohu.com/");
+            mRequest1.setHost("http://localhost:8880");
             mRequest1.addBasicHeader("MyCookie", "123456789");
             mRequest1.addBasicHeader("MyCookie2", "123456789123456");
             mRequest1.addBasicUrlParams("param1", "value");

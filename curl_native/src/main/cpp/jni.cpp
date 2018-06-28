@@ -3,6 +3,7 @@
 #include "android_utils.h"
 
 #include "manager/httpmanager.h"
+#include "sha.h"
 
 
 JavaVM *g_jvm;
@@ -602,4 +603,25 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_download(JNIEnv *env, jclass type
     if (strFilePath_ && strFilePath) {
         env->ReleaseStringUTFChars(strFilePath_, strFilePath);
     }
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_github_yutianzuo_curl_1native_JniCurl_sha256(JNIEnv *env, jclass type, jstring value_) {
+    const char *value = nullptr;
+
+    if (value_) {
+        value = env->GetStringUTFChars(value_, 0);
+    }
+
+    std::string strValue;
+    if (value) {
+        strValue = value;
+    }
+
+    std::string strRet = sha256(strValue);
+
+    env->ReleaseStringUTFChars(value_, value);
+
+    return env->NewStringUTF(strRet.c_str());
 }

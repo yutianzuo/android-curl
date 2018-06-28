@@ -7,6 +7,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.github.yutianzuo.curl_native.JniCurl;
 import com.github.yutianzuo.curl_native.utils.Misc;
 import com.github.yutianzuo.myapplication.BizNetWrapper.HttpCallbackBiz;
 
@@ -34,6 +35,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnPut.setOnClickListener(this);
         btnPostFile.setOnClickListener(this);
         btnDownload.setOnClickListener(this);
+
+        String strSha = JniCurl.sha256("abcd");
+        strSha = "cpp:" + strSha;
+        String strShaJava = new Crypto().SHA256("abcd");
+        strShaJava = "java:" + strShaJava;
+        mTextView.setText(strSha);
 
     }
 
@@ -75,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 addHeader("customheader2", "value").
                 addUrlParam("customparam1", "value").
                 addUrlParam("customparam2", "value").
-                setPath("").
+                setPath("567/234").
                 get(new HttpCallbackBiz() {
                     @Override
                     public void success(BeanTest data) {

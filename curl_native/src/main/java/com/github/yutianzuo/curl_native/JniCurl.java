@@ -39,4 +39,6 @@ public class JniCurl {
 
     public static native void download(String strHash, int requestSeq, String strPath, List<String> headers_keys,
             List<String> headers_values, List<String> params_keys, List<String> params_values, String strFilePath);
+
+    public static native String sha256(String value);
 }
