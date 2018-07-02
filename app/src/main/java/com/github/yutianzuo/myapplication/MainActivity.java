@@ -36,11 +36,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnPostFile.setOnClickListener(this);
         btnDownload.setOnClickListener(this);
 
+        //----------------------------crypto test
+
+        //a demo java aes-encryt data and openssl aes-deccryt data
+        byte[] aseByte = new Crypto().aesEncrypt("0123456789abcdef", "fedcba9876543210", "Yutianzuo12345678");
+        String strDecryptString = JniCurl.aesCbc(aseByte, aseByte.length, "0123456789abcdef", "fedcba9876543210");
+
         String strSha = JniCurl.sha256("abcd");
         strSha = "cpp:" + strSha;
         String strShaJava = new Crypto().SHA256("abcd");
         strShaJava = "java:" + strShaJava;
         mTextView.setText(strSha);
+
+        //----------------------------crypto test
 
     }
 

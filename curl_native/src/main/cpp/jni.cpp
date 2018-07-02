@@ -4,6 +4,7 @@
 
 #include "manager/httpmanager.h"
 #include "sha.h"
+#include "aes_cbc.h"
 
 
 JavaVM *g_jvm;
@@ -624,4 +625,27 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_sha256(JNIEnv *env, jclass type, 
     env->ReleaseStringUTFChars(value_, value);
 
     return env->NewStringUTF(strRet.c_str());
+}
+
+extern "C"
+JNIEXPORT jstring JNICALL
+Java_com_github_yutianzuo_curl_1native_JniCurl_aesCbc(JNIEnv *env, jclass type, jbyteArray encrytData_, jint len,
+                                                      jstring key_, jstring iv_) {
+    if (!encrytData_ || !key_ || !iv_) {
+        return nullptr;
+    }
+
+    jbyte *encrytData = env->GetByteArrayElements(encrytData_, NULL);
+    const char *key = env->GetStringUTFChars(key_, 0);
+    const char *iv = env->GetStringUTFChars(iv_, 0);
+
+    std::string str_key(key), str_iv(iv);
+
+    std::string str_ret = decrypt_aescbc((const unsigned char*)encrytData, len, str_key, str_iv);
+
+    env->ReleaseByteArrayElements(encrytData_, encrytData, 0);
+    env->ReleaseStringUTFChars(key_, key);
+    env->ReleaseStringUTFChars(iv_, iv);
+
+    return env->NewStringUTF(str_ret.c_str());
 }

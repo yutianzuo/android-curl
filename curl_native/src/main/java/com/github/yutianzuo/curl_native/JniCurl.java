@@ -41,4 +41,6 @@ public class JniCurl {
             List<String> headers_values, List<String> params_keys, List<String> params_values, String strFilePath);
 
     public static native String sha256(String value);
+
+    public static native String aesCbc(byte[] encrytData, int len, String key, String iv);
 }
