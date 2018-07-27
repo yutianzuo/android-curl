@@ -29,7 +29,7 @@ public:
     {
         if (!g_threadpool)
         {
-            g_threadpool = new stdx::ThreadPool(n_threadpool_size);
+            g_threadpool = new stdx::ThreadPool(n_threadpool_size, 16);
         }
     }
 
