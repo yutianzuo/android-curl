@@ -12,6 +12,9 @@
 class HttpManager
 {
 public:
+    /**
+     * NOT thread-safe, better init this at the beginning of application
+     */
     static HttpManager *get_instance()
     {
         if (!g_manager)
@@ -32,7 +35,7 @@ public:
     /**
      * may block,depends threads condition,so call this when application will exit, better invoke in a workthread
      * or
-     * dont invoke this kill process
+     * dont invoke this, kill process instead
      */
     static void uninit()
     {
