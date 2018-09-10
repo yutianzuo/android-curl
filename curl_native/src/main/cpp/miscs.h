@@ -17,6 +17,9 @@
 #include <unistd.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/types.h>
+#include <pwd.h>
+#include <grp.h>
 
 #include "string_x.h"
 
@@ -32,6 +35,115 @@
 #ifndef FUNCTION_END
 #define FUNCTION_END }while(false)
 #endif
+
+
+inline
+std::string get_uidname(uid_t uid)
+{
+    struct passwd *pw_ptr;
+
+    if ((pw_ptr = ::getpwuid(uid)) == NULL)
+    {
+        char numstr[10] = {0};
+        sprintf(numstr, "%d", uid);
+        return stringxa(numstr);
+    }
+    else
+    {
+        return stringxa(pw_ptr->pw_name);
+    }
+}
+
+inline
+std::string get_gidname(gid_t gid)
+{
+    struct group *grp_ptr;
+
+    if ((grp_ptr = ::getgrgid(gid)) == NULL)
+    {
+        char numstr[10] = {0};
+        sprintf(numstr, "%d", gid);
+        return stringxa(numstr);
+    }
+    else
+    {
+        return stringxa(grp_ptr->gr_name);
+    }
+}
+
+/**
+ * mod              | struname | strgname
+ * 0777             | user     | group
+ * 0-oct,4-R,2-W,1-X
+ */
+inline
+bool get_fileprop(const char* path, std::string& mod, std::string& struname, std::string& strgname)
+{
+    if (!path)
+    {
+        return false;
+    }
+    struct stat file_stat;
+    int ret = stat(path, &file_stat);
+    if (ret == -1)
+    {
+        return false;
+    }
+    struname = get_uidname(file_stat.st_uid);
+    strgname = get_gidname(file_stat.st_gid);
+
+    int fmod = 0;
+    if (file_stat.st_mode & S_IRUSR)
+    {
+         fmod += S_IRUSR;
+    }
+
+    if (file_stat.st_mode & S_IWUSR)
+    {
+        fmod += S_IWUSR;
+    }
+
+    if (file_stat.st_mode & S_IXUSR)
+    {
+        fmod += S_IXUSR;
+    }
+
+    if (file_stat.st_mode & S_IRGRP)
+    {
+        fmod += S_IRGRP;
+    }
+
+    if (file_stat.st_mode & S_IWGRP)
+    {
+        fmod += S_IWGRP;
+    }
+
+    if (file_stat.st_mode & S_IXGRP)
+    {
+        fmod += S_IXGRP;
+    }
+
+    if (file_stat.st_mode & S_IROTH)
+    {
+        fmod += S_IROTH;
+    }
+
+    if (file_stat.st_mode & S_IWOTH)
+    {
+        fmod += S_IWOTH;
+    }
+
+    if (file_stat.st_mode & S_IXOTH)
+    {
+        fmod += S_IXOTH;
+    }
+
+    char szmod[16] = {0};
+    sprintf(szmod, "0%o", fmod);
+    mod.assign(szmod);
+    return true;
+}
+
 
 inline
 void hex_printf(const unsigned char* sz_input, int len)
