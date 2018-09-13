@@ -299,8 +299,12 @@ public:
     {
     }
 
-    stringx(const _Elem *_Ptr) : _basic_type(_Ptr)
+    stringx(const _Elem *_Ptr) : _basic_type()
     {
+        if (_Ptr)
+        {
+            _basic_type::assign(_Ptr);
+        }
     }
 
     //copy construction
@@ -310,7 +314,7 @@ public:
     {
     }
 
-#ifndef _LIBCPP_HAS_NO_RVALUE_REFERENCES
+#if __cplusplus >= 201103L
 
     stringx(_derive_type &&rvalue) : _basic_type(std::move(rvalue))
     {
@@ -430,7 +434,7 @@ public:
     }
 
 
-#ifdef _LIBCPP_TEMPLATE_VIS
+#if __cplusplus >= 201103L
 
     template<typename HEAD, typename ...TAIL>
     void format_multitype(HEAD first, TAIL... args)
