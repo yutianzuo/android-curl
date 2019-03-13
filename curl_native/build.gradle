@@ -10,16 +10,14 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
-//        externalNativeBuild {
-//            cmake {
-//                cppFlags "-std=c++11"
-//                arguments "-DANDROID_ABI=armeabi-v7a"
-//            }
-//        }
-        ndk {
-            abiFilters 'armeabi-v7a'
+        externalNativeBuild {
+            cmake {
+                cppFlags "-std=c++11"
+                //by default cmake use static stl library
+                arguments = ["-DANDROID_STL=c++_shared"]
+                abiFilters 'armeabi-v7a'
+            }
         }
-
     }
     buildTypes {
         release {
@@ -27,7 +25,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             externalNativeBuild {
                 cmake {
-                    cppFlags "-std=c++11"
+                    cppFlags "-fvisibility=hidden", "-fno-unwind-tables", "-fno-asynchronous-unwind-tables"
                     arguments "-DCMAKE_BUILD_TYPE=Release"
                 }
             }
@@ -36,7 +34,6 @@ android {
             debuggable false
             externalNativeBuild {
                 cmake {
-                    cppFlags "-std=c++11"
                     arguments "-DCMAKE_BUILD_TYPE=Debug"
                 }
             }
@@ -47,7 +44,7 @@ android {
             path "CMakeLists.txt"
         }
     }
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
 }
 
 dependencies {

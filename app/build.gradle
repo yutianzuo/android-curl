@@ -17,6 +17,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
     }
     buildTypes {
         release {
@@ -28,8 +31,14 @@ android {
             signingConfig signingConfigs.SignConfig
         }
     }
-    buildToolsVersion '27.0.3'
+    buildToolsVersion '28.0.3'
     productFlavors {
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        // Or, if you prefer, you can continue to check for errors in release builds,
+        // but continue the build even when errors are found:
+        abortOnError false
     }
 }
 repositories {
