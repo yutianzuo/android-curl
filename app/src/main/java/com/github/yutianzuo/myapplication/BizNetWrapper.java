@@ -32,7 +32,8 @@ public enum BizNetWrapper {
     public RequestManager getBizRequestManager(Context context) {
         if (mRequest1 == null) {
             mRequest1 = HttpManager.INSTANCE.getRequest();
-            mRequest1.setHost("https://www.baidu.com");
+//            mRequest1.setHost("https://sha1.badssl.com"); //an example : ca not valid
+            mRequest1.setHost("https://example.com");
             mRequest1.addBasicHeader("MyCookie", "123456789");
             mRequest1.addBasicHeader("MyCookie2", "123456789123456");
             mRequest1.addBasicUrlParams("param1", "value");

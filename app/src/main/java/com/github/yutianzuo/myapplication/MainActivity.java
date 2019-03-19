@@ -77,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 addHeader("customheader2", "value").
                 addUrlParam("customparam1", "value").
                 addUrlParam("customparam2", "value").
-                setPath("567/234").
+//                setPath("567/234").
                 get(new HttpCallbackBiz() {
                     @Override
                     public void success(BeanTest data) {
