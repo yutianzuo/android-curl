@@ -101,7 +101,7 @@ elseif (${ANDROID_ABI} MATCHES armeabi-v7a)
 
             # Provides the path to the library you want to import.
             #../../../../src/main/cpp/lib/libssl.a)
-            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libssl.a)
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/v7a/libssl.a)
 
     set_target_properties( # Specifies the target library.
             libcrypto
@@ -111,7 +111,7 @@ elseif (${ANDROID_ABI} MATCHES armeabi-v7a)
 
             # Provides the path to the library you want to import.
             #../../../../src/main/cpp/lib/libcrypto.a)
-            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcrypto.a)
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/v7a/libcrypto.a)
 
     set_target_properties( # Specifies the target library.
             libcurl
@@ -120,7 +120,7 @@ elseif (${ANDROID_ABI} MATCHES armeabi-v7a)
             PROPERTIES IMPORTED_LOCATION
 
             # Provides the path to the library you want to import.
-            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcurl.a)
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/v7a/libcurl.a)
 endif ()
 
 
