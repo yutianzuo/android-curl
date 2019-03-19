@@ -15,7 +15,7 @@ android {
                 cppFlags "-std=c++11"
                 //by default cmake use static stl library
                 arguments = ["-DANDROID_STL=c++_shared"]
-                abiFilters 'armeabi-v7a'
+                abiFilters 'armeabi-v7a', 'x86'
             }
         }
     }

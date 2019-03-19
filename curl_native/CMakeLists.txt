@@ -50,42 +50,79 @@ find_library( # Sets the name of the path variable.
 add_library(libssl
         STATIC
         IMPORTED)
-set_target_properties( # Specifies the target library.
-        libssl
-
-        # Specifies the parameter you want to define.
-        PROPERTIES IMPORTED_LOCATION
-
-        # Provides the path to the library you want to import.
-        #../../../../src/main/cpp/lib/libssl.a)
-        ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libssl.a)
 
 add_library(libcrypto
         STATIC
         IMPORTED)
-set_target_properties( # Specifies the target library.
-        libcrypto
-
-        # Specifies the parameter you want to define.
-        PROPERTIES IMPORTED_LOCATION
-
-        # Provides the path to the library you want to import.
-        #../../../../src/main/cpp/lib/libcrypto.a)
-        ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcrypto.a)
-
 
 add_library(libcurl
         STATIC
         IMPORTED)
 
-set_target_properties( # Specifies the target library.
-        libcurl
 
-        # Specifies the parameter you want to define.
-        PROPERTIES IMPORTED_LOCATION
+if (${ANDROID_ABI} MATCHES x86)
 
-        # Provides the path to the library you want to import.
-        ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcurl.a)
+    set_target_properties( # Specifies the target library.
+            libssl
+
+            # Specifies the parameter you want to define.
+            PROPERTIES IMPORTED_LOCATION
+
+            # Provides the path to the library you want to import.
+            #../../../../src/main/cpp/lib/libssl.a)
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/x86/libssl.a)
+
+    set_target_properties( # Specifies the target library.
+            libcrypto
+
+            # Specifies the parameter you want to define.
+            PROPERTIES IMPORTED_LOCATION
+
+            # Provides the path to the library you want to import.
+            #../../../../src/main/cpp/lib/libcrypto.a)
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/x86/libcrypto.a)
+
+
+    set_target_properties( # Specifies the target library.
+            libcurl
+
+            # Specifies the parameter you want to define.
+            PROPERTIES IMPORTED_LOCATION
+
+            # Provides the path to the library you want to import.
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/x86/libcurl.a)
+
+elseif (${ANDROID_ABI} MATCHES armeabi-v7a)
+    set_target_properties( # Specifies the target library.
+            libssl
+
+            # Specifies the parameter you want to define.
+            PROPERTIES IMPORTED_LOCATION
+
+            # Provides the path to the library you want to import.
+            #../../../../src/main/cpp/lib/libssl.a)
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libssl.a)
+
+    set_target_properties( # Specifies the target library.
+            libcrypto
+
+            # Specifies the parameter you want to define.
+            PROPERTIES IMPORTED_LOCATION
+
+            # Provides the path to the library you want to import.
+            #../../../../src/main/cpp/lib/libcrypto.a)
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcrypto.a)
+
+    set_target_properties( # Specifies the target library.
+            libcurl
+
+            # Specifies the parameter you want to define.
+            PROPERTIES IMPORTED_LOCATION
+
+            # Provides the path to the library you want to import.
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/libcurl.a)
+endif ()
+
 
 # Specifies libraries CMake should link to your target library. You
 # can link multiple libraries, such as libraries you define in this
