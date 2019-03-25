@@ -10,6 +10,36 @@
 JavaVM *g_jvm;
 jobject g_obj = nullptr;
 
+class JNIEnvPtr {
+public:
+    JNIEnvPtr() : env_{nullptr}, need_detach_{false} {
+        if (g_jvm->GetEnv((void**) &env_, JNI_VERSION_1_6) ==
+            JNI_EDETACHED) {
+            g_jvm->AttachCurrentThread(&env_, nullptr);
+            need_detach_ = true;
+        }
+    }
+
+    ~JNIEnvPtr() {
+        if (need_detach_) {
+            g_jvm->DetachCurrentThread();
+        }
+    }
+
+    JNIEnv* operator->() {
+        return env_;
+    }
+
+private:
+    JNIEnvPtr(const JNIEnvPtr&) = delete;
+    JNIEnvPtr& operator=(const JNIEnvPtr&) = delete;
+
+private:
+    JNIEnv* env_;
+    bool need_detach_;
+};
+
+
 jint JNI_OnLoad(JavaVM *vm, void *reserved) {
     g_jvm = vm;
     return JNI_VERSION_1_6;
@@ -20,27 +50,29 @@ static void GlobalCallBackFunc(int result, const std::string &respones, float pe
     LOGE("%s", respones.c_str());
     HttpManager::get_instance()->manual_lock();
 
-    JNIEnv *env = NULL;
-    if (g_jvm) {
-        g_jvm->AttachCurrentThread(&env, NULL);
-    }
+    JNIEnvPtr jnienv_holder;
 
-    if (env && g_obj) {
-        jclass clazz = env->GetObjectClass(g_obj);
-        jmethodID method = env->GetMethodID(clazz, "callBack", "(ILjava/lang/String;FII)V");
+//    JNIEnv *env = NULL;
+//    if (g_jvm) {
+//        g_jvm->AttachCurrentThread(&env, NULL);
+//    }
+
+    if (g_obj) {
+        jclass clazz = jnienv_holder->GetObjectClass(g_obj);
+        jmethodID method = jnienv_holder->GetMethodID(clazz, "callBack", "(ILjava/lang/String;FII)V");
         jstring jrespones = nullptr;
         try {
-            jrespones = env->NewStringUTF(respones.c_str());
+            jrespones = jnienv_holder->NewStringUTF(respones.c_str());
         } catch (...) {
 
         }
-        env->CallVoidMethod(g_obj, method, result, jrespones, persent, seq, errcode);
+        jnienv_holder->CallVoidMethod(g_obj, method, result, jrespones, persent, seq, errcode);
     }
 
 
-    if (g_jvm) {
-        g_jvm->DetachCurrentThread();
-    }
+//    if (g_jvm) {
+//        g_jvm->DetachCurrentThread();
+//    }
 
     HttpManager::get_instance()->manual_unlock();
 }
