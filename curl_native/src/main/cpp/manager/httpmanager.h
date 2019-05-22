@@ -76,32 +76,12 @@ public:
         return p;
     }
 
-    void manual_lock()
-    {
-        try
-        {
-            m_lock.lock();
-        } catch (...)
-        {}
-    }
-
-    void manual_unlock()
-    {
-        try
-        {
-            m_lock.unlock();
-        } catch (...)
-        {}
-    }
-
-
 private:
-    HttpManager() : m_lock(m_mutex, std::defer_lock)
+    HttpManager()
     {}
 
     using MAP = std::map<std::string, RequestManager *>;
     MAP m_request_managers;
-    std::unique_lock<std::mutex> m_lock;
     std::mutex m_mutex;
     static HttpManager *g_manager;
 };
