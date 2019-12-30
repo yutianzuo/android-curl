@@ -114,6 +114,7 @@ public:
         curl_easy_setopt(m_curl_handle, CURLOPT_TIMEOUT, 15);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEDATA, (void *) &m_buffer);
+        curl_easy_setopt(m_curl_handle, CURLOPT_FOLLOWLOCATION, 1L); //follow location. e.g. 301/302/203
 
 //        m_headers = curl_slist_append(m_headers, "Accept: text/html;charset=UTF-8");
 //        m_headers = curl_slist_append(m_headers, "Accept-Charset: ISO-8859-1");
