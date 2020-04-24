@@ -109,13 +109,14 @@ public:
         curl_easy_setopt(m_curl_handle, CURLOPT_ACCEPT_ENCODING, "");/* enable all supported built-in compressions */
         //this enable gzip if support, and auto decompress the gzip reponse
         curl_easy_setopt(m_curl_handle, CURLOPT_NOSIGNAL, 1);
-        curl_easy_setopt(m_curl_handle, CURLOPT_HEADER, 0); //是否输出header信息
+        curl_easy_setopt(m_curl_handle, CURLOPT_HEADER, 1); //是否输出header信息
         curl_easy_setopt(m_curl_handle, CURLOPT_CONNECTTIMEOUT, 10); // set transport and time out time
         curl_easy_setopt(m_curl_handle, CURLOPT_TIMEOUT, 15);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEDATA, (void *) &m_buffer);
         curl_easy_setopt(m_curl_handle, CURLOPT_FOLLOWLOCATION, 1L); //follow location. e.g. 301/302/203
-
+        //https enable http2.0 by default;
+        curl_easy_setopt(m_curl_handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
 //        m_headers = curl_slist_append(m_headers, "Accept: text/html;charset=UTF-8");
 //        m_headers = curl_slist_append(m_headers, "Accept-Charset: ISO-8859-1");
 

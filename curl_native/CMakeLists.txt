@@ -59,6 +59,10 @@ add_library(libcurl
         STATIC
         IMPORTED)
 
+add_library(libnghttp2
+        STATIC
+        IMPORTED)
+
 
 if (${ANDROID_ABI} MATCHES x86)
 
@@ -121,6 +125,15 @@ elseif (${ANDROID_ABI} MATCHES armeabi-v7a)
 
             # Provides the path to the library you want to import.
             ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/v7a/libcurl.a)
+
+    set_target_properties( # Specifies the target library.
+            libnghttp2
+
+            # Specifies the parameter you want to define.
+            PROPERTIES IMPORTED_LOCATION
+
+            # Provides the path to the library you want to import.
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/v7a/libnghttp2.a)
 elseif (${ANDROID_ABI} MATCHES arm64-v8a)
     set_target_properties( # Specifies the target library.
             libssl
@@ -150,6 +163,15 @@ elseif (${ANDROID_ABI} MATCHES arm64-v8a)
 
             # Provides the path to the library you want to import.
             ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/arm64/libcurl.a)
+
+    set_target_properties( # Specifies the target library.
+            libnghttp2
+
+            # Specifies the parameter you want to define.
+            PROPERTIES IMPORTED_LOCATION
+
+            # Provides the path to the library you want to import.
+            ${CMAKE_SOURCE_DIR}/src/main/cpp/lib/arm64/libnghttp2.a)
 endif ()
 
 
@@ -162,6 +184,7 @@ target_link_libraries( # Specifies the target library.
         libcurl
         libssl
         libcrypto
+        libnghttp2
         z
         # Links the target library to the log library
         # included in the NDK.
