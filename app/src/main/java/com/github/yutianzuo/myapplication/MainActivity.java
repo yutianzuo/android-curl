@@ -21,11 +21,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         Button btnGet = findViewById(R.id.get);
+        Button btnGet20 = findViewById(R.id.gethttp20);
         Button btnPostForm = findViewById(R.id.postform);
         Button btnPostJson = findViewById(R.id.postjson);
         Button btnPut = findViewById(R.id.put);
         Button btnPostFile = findViewById(R.id.postfile);
         Button btnDownload = findViewById(R.id.download);
+
 
         mTextView = findViewById(R.id.txt_info);
 
@@ -35,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         btnPut.setOnClickListener(this);
         btnPostFile.setOnClickListener(this);
         btnDownload.setOnClickListener(this);
+        btnGet20.setOnClickListener(this);
 
         cryptoTestcase();
     }
@@ -48,6 +51,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
+            case R.id.gethttp20:
+                testCaseGet20();
+                break;
             case R.id.get:
                 testCaseGet();
                 break;
@@ -67,6 +73,31 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 testCaseDownload();
                 break;
         }
+    }
+
+    private void testCaseGet20() {
+        mTextView.setText("Get TestCase Begins");
+        new BizNetWrapper.UrlBuilder().
+                with(BizNetWrapper.INSTANCE.getBizRequestManager20(MainActivity.this)).
+        get(
+        new HttpCallbackBiz() {
+            @Override
+            public void success(BeanTest data) {
+                mTextView.setText("Get TestCase OK");
+                //Log.e("JAVA_TAG", data.rep);
+            }
+
+            @Override
+            public void fail(int errcode) {
+                mTextView.setText("Get TestCase Failed:" + errcode);
+                Log.e("JAVA_TAG", "fail:" + errcode);
+            }
+
+            @Override
+            public void progress(float persent) {
+                Log.e("JAVA_TAG", "progress");
+            }
+        });
     }
 
     private void testCaseGet() {

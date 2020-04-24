@@ -6,12 +6,19 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".MainActivity">
+    <Button
+        android:id="@+id/gethttp20"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:text="GET--HTTP2.0"
+        android:textAlignment="center"
+        />
 
     <Button
         android:id="@+id/get"
         android:layout_width="match_parent"
         android:layout_height="45dp"
-        android:text="GET"
+        android:text="GET--HTTPS"
         android:textAlignment="center"
         />
 

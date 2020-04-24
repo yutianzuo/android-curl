@@ -109,7 +109,7 @@ public:
         curl_easy_setopt(m_curl_handle, CURLOPT_ACCEPT_ENCODING, "");/* enable all supported built-in compressions */
         //this enable gzip if support, and auto decompress the gzip reponse
         curl_easy_setopt(m_curl_handle, CURLOPT_NOSIGNAL, 1);
-        curl_easy_setopt(m_curl_handle, CURLOPT_HEADER, 1); //是否输出header信息
+        curl_easy_setopt(m_curl_handle, CURLOPT_HEADER, 0); //是否输出header信息
         curl_easy_setopt(m_curl_handle, CURLOPT_CONNECTTIMEOUT, 10); // set transport and time out time
         curl_easy_setopt(m_curl_handle, CURLOPT_TIMEOUT, 15);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
