@@ -1,5 +1,5 @@
 # android-curl
-so支持v7a、arm64架构，需要真机都可以运行。（内部有x86版本，但是没有编译x86版本的http2）
+so支持v7a、arm64架构，需要真机运行。（内部有x86版本，但是没有编译x86版本的http2）
 通过openssl和mozilla根证书支持https；通过libnghttp2支持http 2.0.
 独立的aar module，可以直接引入项目使用，结合app中的封装demo，可以快速集成进入项目中。
 更多请见文档：https://www.jianshu.com/p/895a4e5052e2
