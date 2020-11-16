@@ -114,7 +114,9 @@ public:
         curl_easy_setopt(m_curl_handle, CURLOPT_TIMEOUT, 15);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEDATA, (void *) &m_buffer);
+        curl_easy_setopt(m_curl_handle, CURLOPT_AUTOREFERER, 1);
         curl_easy_setopt(m_curl_handle, CURLOPT_FOLLOWLOCATION, 1L); //follow location. e.g. 301/302/203
+        curl_easy_setopt(m_curl_handle, CURLOPT_POSTREDIR, CURL_REDIR_POST_ALL); // 301 302 303 post won't switch to get
         //https enable http2.0 by default;
         curl_easy_setopt(m_curl_handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
 //        m_headers = curl_slist_append(m_headers, "Accept: text/html;charset=UTF-8");
