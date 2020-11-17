@@ -20,6 +20,14 @@ public:
 
     HttpPutJsonRequest() : HttpRequest<HttpPutJsonRequest>()
     {
+        m_http_type = HTTPREQUEST_PUT;
+    }
+
+    ~HttpPutJsonRequest()
+    {
+#ifdef CURL_DEBUG
+        std::cout<< "~HttpPutJsonRequest" << std::endl;
+#endif
     }
 
     void set_json(const std::string& str_data)
@@ -40,6 +48,7 @@ public:
         curl_easy_setopt(m_curl_handle, CURLOPT_READDATA, &m_json_stru);
         curl_easy_setopt(m_curl_handle, CURLOPT_READFUNCTION, read_callback);
     }
+    int get_request_type(){return m_http_type;}
 
 private:
     typedef struct

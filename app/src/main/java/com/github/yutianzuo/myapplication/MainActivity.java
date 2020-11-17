@@ -184,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mTextView.setText("PutJson TestCase Begins");
         new BizNetWrapper.UrlBuilder().
                 with(BizNetWrapper.INSTANCE.getBizRequestManager2(MainActivity.this)).
-                setPath("").
+                setPath("api/path3").
                 setJson("{\"key\":\"value\"}").
                 putJson(new HttpCallbackBiz() {
                     @Override

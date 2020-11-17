@@ -21,7 +21,7 @@ public:
 
     HttpGetDownloadRequest() : HttpRequest<HttpGetDownloadRequest>()
     {
-
+        m_http_type = HTTPREQUEST_DOWNLOAD;
     }
 
     ~HttpGetDownloadRequest()
@@ -53,7 +53,7 @@ public:
             m_file = nullptr;
         }
     }
-
+    int get_request_type(){return m_http_type;}
 private:
     FILE *m_file = nullptr;
     size_t m_file_len = 0;

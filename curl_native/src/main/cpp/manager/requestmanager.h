@@ -7,6 +7,8 @@
 
 #include <map>
 #include <string>
+#include <deque>
+#include <memory>
 #include "threadpool.h"
 
 #include "../request/getrequest.h"
@@ -15,7 +17,12 @@
 #include "../request/downloadrequest.h"
 #include "../request/putrequest.h"
 
-class RequestManager
+/*
+ * 对curl链接进行了cache，只cache了postform、postjson、get、put四种请求，这四种请求是业务种最频繁常用的，值得cache的。
+ * 每一种类型的请求cache数量阈值定义为线程池传入大小。时间阈值，在request中定义。
+ * cache可以充分利用http1.1复用链接的好处，也可以充分利用tls一次session的重用，节省时间和算力。
+ */
+class RequestManager : public std::enable_shared_from_this<RequestManager>
 {
 public:
     template<typename T>
@@ -25,8 +32,10 @@ public:
     using STRING_MAP_IT = STRING_MAP::iterator;
     using CONST_STRING_MAP_IT = STRING_MAP::const_iterator;
 
+
     static void init(int n_threadpool_size)
     {
+        POOL_SIZE = n_threadpool_size;
         if (!g_threadpool)
         {
             g_threadpool = new stdx::ThreadPool(n_threadpool_size, 16);
@@ -41,6 +50,14 @@ public:
             delete g_threadpool;
             g_threadpool = nullptr;
         }
+    }
+
+    ~RequestManager()
+    {
+        clear_pool();
+#ifdef CURL_DEBUG
+        std::cout<< "~RequestManager" << std::endl;
+#endif
     }
 
 
@@ -74,8 +91,14 @@ public:
     void get(const std::string &str_path, const STRING_MAP &headers,
              const STRING_MAP &url_params, Callback call_back, size_t seq)
     {
-        HttpGetRequest *get = new HttpGetRequest();
-        inner_add_headers(get, headers);
+
+        std::shared_ptr<HttpGetRequest> get =
+                get_cached_url<HttpGetRequest>(HttpRequest<HttpGetRequest>::HTTPREQUEST_GET, m_get_url_pool);
+        if (!get)
+        {
+            get = std::make_shared<HttpGetRequest>();
+        }
+        inner_add_headers(get.get(), headers);
         std::string str_url = get_url(str_path, url_params);
         get->set_url(str_url);
         get->set_proxy(m_proxy_path);
@@ -83,10 +106,13 @@ public:
         get->set_callback(call_back);
         get->set_request_seq(seq);
 
-        g_threadpool->commit([get]() -> void
+        std::shared_ptr<RequestManager> self = shared_from_this();
+        g_threadpool->commit([get, self]() -> void
                              {
                                  get->go();
-                                 delete get;
+                                 get->reuse_url();
+                                 self->add_cache_url<HttpGetRequest>(HttpRequest<HttpGetRequest>::HTTPREQUEST_GET, get,
+                                                               self->m_get_url_pool);
                              });
 
     }
@@ -95,8 +121,18 @@ public:
     void post_form(const std::string &str_path, const STRING_MAP &headers,
                    const STRING_MAP &form_params, Callback call_back, size_t seq)
     {
-        HttpPostFormDataRequest *post = new HttpPostFormDataRequest(true);
-        inner_add_headers(post, headers);
+        std::shared_ptr<HttpPostFormDataRequest> post =
+                get_cached_url<HttpPostFormDataRequest>(HttpRequest<HttpPostFormDataRequest>::HTTPREQUEST_POSTFORM,
+                                                        m_post_url_pool);
+        if (!post)
+        {
+            post = std::make_shared<HttpPostFormDataRequest>(true);
+        }
+        else
+        {
+            post->set_form_or_json(true);
+        }
+        inner_add_headers(post.get(), headers);
         std::string str_url = get_url(str_path, STRING_MAP());
         post->set_url(str_url);
         post->set_proxy(m_proxy_path);
@@ -117,11 +153,14 @@ public:
         post->set_postformdata(str_form);
         post->set_callback(call_back);
 
-
-        g_threadpool->commit([post]() -> void
+        std::shared_ptr<RequestManager> self = shared_from_this();
+        g_threadpool->commit([post, self]() -> void
                              {
                                  post->go();
-                                 delete post;
+                                 post->reuse_url();
+                                 self->add_cache_url<HttpPostFormDataRequest>(
+                                         HttpRequest<HttpPostFormDataRequest>::HTTPREQUEST_POSTFORM, post,
+                                         self->m_post_url_pool);
                              });
     }
 
@@ -129,8 +168,18 @@ public:
     void post_json(const std::string &str_path, const STRING_MAP &headers,
                    const std::string &json, Callback call_back, size_t seq)
     {
-        HttpPostFormDataRequest *post = new HttpPostFormDataRequest(false);
-        inner_add_headers(post, headers);
+        std::shared_ptr<HttpPostFormDataRequest> post =
+                get_cached_url<HttpPostFormDataRequest>(HttpRequest<HttpPostFormDataRequest>::HTTPREQUEST_POSTJSON,
+                                                        m_post_url_pool);
+        if (!post)
+        {
+            post = std::make_shared<HttpPostFormDataRequest>(false);
+        }
+        else
+        {
+            post->set_form_or_json(false);
+        }
+        inner_add_headers(post.get(), headers);
         std::string str_url = get_url(str_path, STRING_MAP());
         post->set_url(str_url);
         post->set_proxy(m_proxy_path);
@@ -139,10 +188,14 @@ public:
         post->set_postformdata(json);
         post->set_callback(call_back);
 
-        g_threadpool->commit([post]() -> void
+        std::shared_ptr<RequestManager> self = shared_from_this();
+        g_threadpool->commit([post, self]() -> void
                              {
                                  post->go();
-                                 delete post;
+                                 post->reuse_url();
+                                 self->add_cache_url<HttpPostFormDataRequest>(
+                                         HttpRequest<HttpPostFormDataRequest>::HTTPREQUEST_POSTJSON, post,
+                                         self->m_post_url_pool);
                              });
     }
 
@@ -153,8 +206,8 @@ public:
                    const std::string &str_filekeyname, const std::string &str_filename,
                    const std::string &str_filepath, Callback call_back, size_t seq)
     {
-        HttpPostFileRequest *post = new HttpPostFileRequest();
-        inner_add_headers(post, headers);
+        std::shared_ptr<HttpPostFileRequest> post = std::make_shared<HttpPostFileRequest>();
+        inner_add_headers(post.get(), headers);
         std::string str_url = get_url(str_path, STRING_MAP());
         post->set_url(str_url); //should be invoke first
         post->set_proxy(m_proxy_path);
@@ -188,7 +241,6 @@ public:
         g_threadpool->commit([post]() -> void
                              {
                                  post->go();
-                                 delete post;
                              });
 
     }
@@ -198,8 +250,14 @@ public:
              const STRING_MAP &headers, Callback callback, size_t seq
     )
     {
-        HttpPutJsonRequest *put = new HttpPutJsonRequest();
-        inner_add_headers(put, headers);
+        std::shared_ptr<HttpPutJsonRequest> put =
+                get_cached_url<HttpPutJsonRequest>(HttpRequest<HttpPutJsonRequest>::HTTPREQUEST_PUT,
+                                                   m_put_url_pool);
+        if (!put)
+        {
+            put = std::make_shared<HttpPutJsonRequest>();
+        }
+        inner_add_headers(put.get(), headers);
         std::string str_url = get_url(str_path, STRING_MAP());
         put->set_url(str_url);
         put->set_proxy(m_proxy_path);
@@ -208,10 +266,14 @@ public:
         put->set_callback(callback);
         put->set_request_seq(seq);
 
-        g_threadpool->commit([put]() -> void
+        std::shared_ptr<RequestManager> self = shared_from_this();
+        g_threadpool->commit([put, self]() -> void
                              {
                                  put->go();
-                                 delete put;
+                                 put->reuse_url();
+                                 self->add_cache_url<HttpPutJsonRequest>(
+                                         HttpRequest<HttpPutJsonRequest>::HTTPREQUEST_PUT, put,
+                                         self->m_put_url_pool);
                              });
     }
 
@@ -221,8 +283,8 @@ public:
                   const std::string &str_download_filepath,
                   Callback callback, size_t seq)
     {
-        HttpGetDownloadRequest *get = new HttpGetDownloadRequest();
-        inner_add_headers(get, headers);
+        std::shared_ptr<HttpGetDownloadRequest> get = std::make_shared<HttpGetDownloadRequest>();
+        inner_add_headers(get.get(), headers);
         std::string str_url = get_url(str_path, url_params);
         get->set_url(str_url);
         get->set_proxy(m_proxy_path);
@@ -234,7 +296,6 @@ public:
         g_threadpool->commit([get]() -> void
                              {
                                  get->go();
-                                 delete get;
                              });
     }
 
@@ -328,16 +389,79 @@ private:
         return str_url;
     }
 
+    template<class T>
+    std::shared_ptr<T> get_cached_url(int http_type, std::deque<std::shared_ptr<T> >& pool)
+    {
+        std::lock_guard<std::mutex> lock(m_pool_lock);
+        if (http_type == HttpRequest<T>::HTTPREQUEST_GET || http_type == HttpRequest<T>::HTTPREQUEST_POSTFORM ||
+            http_type == HttpRequest<T>::HTTPREQUEST_POSTJSON || HttpRequest<T>::HTTPREQUEST_PUT)
+        {
+            while (pool.size() > 0)
+            {
+                if (pool.front()->can_reuse())
+                {
+                    std::shared_ptr<T> p = pool.front();
+                    pool.pop_front();
+#ifdef CURL_DEBUG
+                    std::cout << "reuse http_request" << std::endl;
+#endif
+                    return p;
+                }
+                else
+                {
+                    pool.pop_front();
+                    continue;
+                }
+            }
+        }
+#ifdef CURL_DEBUG
+        std::cout << "no reuse http_request" << std::endl;
+#endif
+        return std::shared_ptr<T>();
+    }
+
+    template<class T>
+    void add_cache_url(int http_type, const std::shared_ptr<T>& p, std::deque<std::shared_ptr<T> >& pool)
+    {
+        std::lock_guard<std::mutex> lock(m_pool_lock);
+        if (http_type == HttpRequest<T>::HTTPREQUEST_GET || http_type == HttpRequest<T>::HTTPREQUEST_POSTFORM ||
+                http_type == HttpRequest<T>::HTTPREQUEST_POSTJSON || HttpRequest<T>::HTTPREQUEST_PUT)
+        {
+            if (pool.size() >= POOL_SIZE)
+            {
+                pool.pop_back();
+            }
+            pool.push_front(p);
+        }
+    }
+
+    void clear_pool()
+    {
+        std::lock_guard<std::mutex> lock(m_pool_lock);
+        m_get_url_pool.clear();
+        m_put_url_pool.clear();
+        m_post_url_pool.clear();
+    }
+
+
     std::string m_host;
     std::string m_cert_path;
     std::string m_proxy_path;
     STRING_MAP m_basic_params;
     STRING_MAP m_basic_headers;
 
+    std::mutex m_pool_lock;
+
+    ///just cache get post and put.
+    std::deque<std::shared_ptr<HttpGetRequest> > m_get_url_pool;
+    std::deque<std::shared_ptr<HttpPostFormDataRequest> > m_post_url_pool;
+    std::deque<std::shared_ptr<HttpPutJsonRequest> > m_put_url_pool;
+
     static stdx::ThreadPool *g_threadpool;
+    static int POOL_SIZE;
 
 };
 
-stdx::ThreadPool *RequestManager::g_threadpool = nullptr;
+
 
 #endif //USELIBCURL_REQUESTMANAGER_H

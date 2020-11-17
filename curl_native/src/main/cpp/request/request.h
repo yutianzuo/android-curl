@@ -7,6 +7,7 @@
 
 #include "curl.h"
 #include <string>
+#include "../tools/timeutils.h"
 
 
 typedef void(*CallBackFunc)(int, const std::string &, float, size_t, int, void *);
@@ -14,6 +15,18 @@ typedef void(*CallBackFunc)(int, const std::string &, float, size_t, int, void *
 template<typename Derive, typename CallBack = CallBackFunc>
 class HttpRequest
 {
+public:
+    enum
+    {
+        HTTPREQUEST_UNKNOWN = -1,
+        HTTPREQUEST_GET = 0,
+        HTTPREQUEST_POSTJSON = 1,
+        HTTPREQUEST_POSTFORM = 2,
+        HTTPREQUEST_PUT = 3,
+        HTTPREQUEST_POSTFILE = 4,
+        HTTPREQUEST_DOWNLOAD = 5,
+        HTTPALIVE_TIME = 20 * 1000
+    };
 protected:
     HttpRequest()
     {
@@ -57,6 +70,10 @@ protected:
 
     std::string m_proxy_path;
 
+    int m_http_type = HTTPREQUEST_UNKNOWN;
+
+    TimeUtils::elapsed_milli::rep m_url_reuse_time = 0;
+
 public:
     enum
     {
@@ -82,6 +99,21 @@ public:
             return;
         }
         m_headers = curl_slist_append(m_headers, str_header.c_str());
+    }
+
+    bool can_reuse()
+    {
+        return is_valid() && TimeUtils::get_current_time() - m_url_reuse_time < HTTPALIVE_TIME;
+    }
+
+    void reuse_url()
+    {
+        clear_headers();
+        if (is_valid())
+        {
+            curl_easy_reset(m_curl_handle);
+        }
+        m_url_reuse_time = TimeUtils::get_current_time();
     }
 
     void set_url(const std::string &str_url, bool skip_ssl = false)
@@ -119,11 +151,31 @@ public:
         curl_easy_setopt(m_curl_handle, CURLOPT_POSTREDIR, CURL_REDIR_POST_ALL); // 301 302 303 post won't switch to get
         //https enable http2.0 by default;
         curl_easy_setopt(m_curl_handle, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2_0);
-//        m_headers = curl_slist_append(m_headers, "Accept: text/html;charset=UTF-8");
-//        m_headers = curl_slist_append(m_headers, "Accept-Charset: ISO-8859-1");
+
+#ifdef CURL_DEBUG
+        curl_easy_setopt(m_curl_handle, CURLOPT_VERBOSE, 1L);
+        curl_easy_setopt(m_curl_handle, CURLOPT_DEBUGFUNCTION, HttpRequest::debug_callback);
+#endif
 
         (static_cast<Derive *>(this))->config_curl();
     }
+
+#ifdef CURL_DEBUG
+
+    static int debug_callback(CURL *curl, curl_infotype type, char *data, size_t size, void *userptr)
+    {
+        if (type == CURLINFO_TEXT || type == CURLINFO_HEADER_IN || type == CURLINFO_HEADER_OUT)
+        {
+            if (data != NULL && size > 0 && data[size - 1] == '\n')
+            {
+                size = size - 1;
+            }
+            std::cout << "libcurl: " << std::string(data, size);
+        }
+        return 0;
+}
+
+#endif
 
     void set_proxy(const std::string& str_proxy)
     {

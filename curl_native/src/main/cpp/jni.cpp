@@ -121,7 +121,8 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_addBasicHeader(JNIEnv *env, jclas
 
 
     if (strHash && strKey && strValue) {
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager
+                (strHash);
         p->add_basic_headers(strKey, strValue);
     }
     if (strHash_ && strHash) {
@@ -158,7 +159,8 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_addBasicURLParam(JNIEnv *env, jcl
     }
 
     if (strHash && strKey && strValue) {
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager
+                (strHash);
         p->add_basic_url_params(strKey, strValue);
     }
 
@@ -190,7 +192,8 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_setHost(JNIEnv *env, jclass type,
     }
 
     if (strHash && strHost) {
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager
+                (strHash);
         p->set_host(strHost);
     }
 
@@ -273,7 +276,7 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_get(JNIEnv *env, jclass type, jst
     if (strHash && strPath) {
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
         JNIMAP inner_url_params = gen_map(env, params_keys, params_values);
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager(strHash);
         p->get(strPath, inner_headers, inner_url_params, GlobalCallBackFunc, requestSeq);
     }
 
@@ -304,7 +307,8 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_setCertPath(JNIEnv *env, jclass t
     }
 
     if (strHash && strCertPath) {
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager
+                (strHash);
         p->set_cert_path(strCertPath);
     }
 
@@ -332,7 +336,7 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_setProxy(JNIEnv *env, jclass type
     }
 
     if (strHash && proxy) {
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager(strHash);
         p->set_proxy_path(proxy);
     }
 
@@ -367,7 +371,7 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_postFromData(JNIEnv *env, jclass 
     if (strHash && strPath) {
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
         JNIMAP inner_url_params = gen_map(env, params_keys, params_values);
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager(strHash);
         p->post_form(strPath, inner_headers, inner_url_params, GlobalCallBackFunc, requestSeq);
     }
 
@@ -410,7 +414,7 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_postJson(JNIEnv *env, jclass type
 
     if (strHash && strPath) {
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager(strHash);
         p->post_json(strPath, inner_headers, str_json, GlobalCallBackFunc, requestSeq);
     }
 
@@ -455,7 +459,7 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_putJson(JNIEnv *env, jclass type,
 
     if (strHash && strPath) {
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager(strHash);
         p->put(strPath, str_json, inner_headers, GlobalCallBackFunc, requestSeq);
     }
 
@@ -553,7 +557,7 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_postFile(JNIEnv *env, jclass type
     if (strHash && strPath) {
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
         JNIMAP inner_form_params = gen_map(env, params_keys, params_values);
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager(strHash);
         p->post_file(strPath, inner_headers, str_formname, inner_form_params, str_jsonname,
                      str_json,
                      str_filekeyname, str_filename, str_filepath, GlobalCallBackFunc,
@@ -618,7 +622,7 @@ Java_com_github_yutianzuo_curl_1native_JniCurl_download(JNIEnv *env, jclass type
     if (strHash && strPath) {
         JNIMAP inner_headers = gen_map(env, headers_keys, headers_values);
         JNIMAP inner_url_params = gen_map(env, params_keys, params_values);
-        RequestManager *p = HttpManager::get_instance()->get_request_manager(strHash);
+        std::shared_ptr<RequestManager> p = HttpManager::get_instance()->get_request_manager(strHash);
         p->download(strPath, inner_headers, inner_url_params, str_filepath, GlobalCallBackFunc,
                     requestSeq);
     }

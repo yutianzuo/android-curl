@@ -20,6 +20,7 @@ public:
 
     HttpPostFileRequest() : HttpRequest<HttpPostFileRequest>()
     {
+        m_http_type = HTTPREQUEST_POSTFILE;
     }
 
     ~HttpPostFileRequest()
@@ -34,7 +35,7 @@ public:
             ::fclose(m_f);
         }
     }
-
+    int get_request_type(){return m_http_type;}
     void set_formdata(const std::string &str_name, const std::string &str_data)
     {
         if (!is_valid() || !is_mime_valid())

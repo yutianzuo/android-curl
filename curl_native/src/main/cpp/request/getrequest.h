@@ -20,9 +20,15 @@ public:
 
     HttpGetRequest() : HttpRequest()
     {
-
+        m_http_type = HTTPREQUEST_GET;
     }
-
+    ~HttpGetRequest()
+    {
+#ifdef CURL_DEBUG
+        std::cout<< "~HttpGetRequest" << std::endl;
+#endif
+    }
+    int get_request_type(){return m_http_type;}
 };
 
 #endif //USELIBCURL_GETREQUEST_H

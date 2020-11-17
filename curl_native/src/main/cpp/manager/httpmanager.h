@@ -51,41 +51,57 @@ public:
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ~HttpManager()
     {
-        for (auto p : m_request_managers)
-        {
-            if (p.second)
-            {
-                delete (p.second);
-            }
-        }
         m_request_managers.clear();
+#ifdef CURL_DEBUG
+        std::cout<< "~HttpManager" << std::endl;
+#endif
     }
 
-    RequestManager *get_request_manager(const std::string &str_key)
+    std::shared_ptr<RequestManager> get_request_manager(const std::string &str_key)
     {
-        RequestManager *p;
+        std::shared_ptr<RequestManager> sp;
         if (m_request_managers.find(str_key) == m_request_managers.end())
         {
-            p = new RequestManager();
-            m_request_managers[str_key] = p;
+            sp = std::make_shared<RequestManager>();
+            m_request_managers[str_key] = sp;
         }
         else
         {
-            p = m_request_managers.at(str_key);
+            sp = m_request_managers.at(str_key);
         }
-        return p;
+        return sp;
     }
 
+    void manual_lock()
+    {
+        try
+        {
+            m_lock.lock();
+        } catch (...)
+        {}
+    }
+
+    void manual_unlock()
+    {
+        try
+        {
+            m_lock.unlock();
+        } catch (...)
+        {}
+    }
+
+
 private:
-    HttpManager()
+    HttpManager() : m_lock(m_mutex, std::defer_lock)
     {}
 
-    using MAP = std::map<std::string, RequestManager *>;
+    using MAP = std::map<std::string, std::shared_ptr<RequestManager> >;
     MAP m_request_managers;
+    std::unique_lock<std::mutex> m_lock;
     std::mutex m_mutex;
     static HttpManager *g_manager;
 };
 
-HttpManager *HttpManager::g_manager = nullptr;
+
 
 #endif //USELIBCURL_HTTPMANAGER_H
