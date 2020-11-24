@@ -6,6 +6,7 @@
 #define USELIBCURL_POSTFILEREQUEST_H
 
 #include "request.h"
+#include <fstream>
 
 class HttpPostFileRequest : public HttpRequest<HttpPostFileRequest>
 {
@@ -30,9 +31,9 @@ public:
             curl_mime_free(m_mime);
             m_mime = nullptr;
         }
-        if (m_f)
+        if (m_file.is_open())
         {
-            ::fclose(m_f);
+            m_file.close();
         }
     }
     int get_request_type(){return m_http_type;}
@@ -71,13 +72,16 @@ public:
         curl_mime_name(part, str_name.c_str());
         if (need_persent)
         {
-            m_f = ::fopen(str_path.c_str(), "r+b");
-            ::fseek(m_f, 0L, SEEK_END);
-            m_filesize = ftell(m_f);
-            m_uploadsize = 0;
-            ::rewind(m_f);
-            curl_mime_data_cb(part, m_filesize, readfunc, nullptr, nullptr, this);
-            curl_mime_type(part, "application/octet-stream");
+            m_file.open(str_path);
+            if (m_file.is_open())
+            {
+                m_file.seekg(0, std::ios::seekdir::end);
+                m_filesize = m_file.tellg();
+                m_uploadsize = 0;
+                m_file.seekg(std::ios::seekdir::beg);
+                curl_mime_data_cb(part, m_filesize, readfunc, nullptr, nullptr, this);
+                curl_mime_type(part, "application/octet-stream");
+            }
         }
         else
         {
@@ -105,14 +109,14 @@ private:
     static size_t readfunc(char *buffer, size_t size, size_t nitems, void *arg)
     {
         auto p = (HttpPostFileRequest *) arg;
-        if (p && p->m_f)
+        if (p && p->m_file)
         {
-            size_t n_ret = ::fread(buffer, size, nitems, p->m_f);
+            p->m_file.read(buffer, size * nitems);
+            size_t n_ret = p->m_file.gcount();
 
-            if (n_ret <= 0)
+            if (n_ret == 0)
             {
-                ::fclose(p->m_f);
-                p->m_f = nullptr;
+                p->m_file.close();
             }
             else
             {
@@ -140,7 +144,7 @@ private:
     }
 
     curl_mime *m_mime = nullptr;
-    FILE *m_f = nullptr;
+    std::ifstream m_file;
     long m_filesize = 0;
     long m_uploadsize = 0;
 

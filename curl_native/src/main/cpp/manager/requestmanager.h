@@ -213,10 +213,6 @@ public:
         post->set_proxy(m_proxy_path);
         post->set_cert(m_cert_path);
         post->set_request_seq(seq);
-        if (str_filepath.size())
-        {
-            post->set_filepath(str_filekeyname, str_filepath, str_filename, true);
-        }
         if (form_params.size())
         {
             std::string str_form;
@@ -236,6 +232,10 @@ public:
         if (json.size())
         {
             post->set_jsondata(str_jsonname, json);
+        }
+        if (str_filepath.size())
+        {
+            post->set_filepath(str_filekeyname, str_filepath, str_filename, true);
         }
         post->set_callback(call_back);
         g_threadpool->commit([post]() -> void

@@ -20,6 +20,7 @@ set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -march=armv7-a")
 
 if (${CMAKE_BUILD_TYPE} MATCHES Debug)
     add_definitions(-DENABLE_LOG)
+    add_definitions(-DCURL_DEBUG)
 endif ()
 
 #add_definitions(-DENABLE_LOG)

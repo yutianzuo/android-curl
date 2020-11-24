@@ -6,6 +6,7 @@
 #define USELIBCURL_DOWNLOADREQUEST_H
 
 #include <iostream>
+#include <fstream>
 #include "request.h"
 
 class HttpGetDownloadRequest : public HttpRequest<HttpGetDownloadRequest>
@@ -42,20 +43,19 @@ public:
 
     void set_download_filepath(const std::string &str_path)
     {
-        m_file = ::fopen(str_path.c_str(), "w+b");
+        m_file.open(str_path);
     }
 
     void closefile()
     {
-        if (m_file)
+        if (m_file.is_open())
         {
-            ::fclose(m_file);
-            m_file = nullptr;
+            m_file.close();
         }
     }
     int get_request_type(){return m_http_type;}
 private:
-    FILE *m_file = nullptr;
+    std::ofstream m_file;
     size_t m_file_len = 0;
 
     static size_t write_file_callback(void *ptr, size_t size, size_t nmemb, void *stream)
@@ -67,14 +67,15 @@ private:
         }
         curl_off_t cl;
         curl_easy_getinfo(p->m_curl_handle, CURLINFO_CONTENT_LENGTH_DOWNLOAD_T, &cl);
-        FILE *fp = p->m_file;
-        size_t n_ret = ::fwrite(ptr, size, nmemb, fp);
-        if (n_ret <= 0)
+
+        size_t n_ret = size * nmemb;
+        if (n_ret == 0)
         {
             return 0;
         }
         else
         {
+            p->m_file.write((char*)ptr, n_ret);
             p->m_file_len += n_ret;
             float persent = 0.0f;
             if (n_ret > 0 && n_ret <= cl)
