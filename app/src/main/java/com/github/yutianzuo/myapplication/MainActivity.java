@@ -10,12 +10,15 @@ import android.widget.TextView;
 import com.github.yutianzuo.curl_native.JniCurl;
 import com.github.yutianzuo.curl_native.utils.Misc;
 import com.github.yutianzuo.myapplication.BizNetWrapper.HttpCallbackBiz;
+import com.github.yutianzuo.native_crash_handler.NativeCrashHandler;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
     TextView mTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        NativeCrashHandler.installNativeCrashHandler("/sdcard/curlcrash.log");
+
         BizNetWrapper.INSTANCE.init(this);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
