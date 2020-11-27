@@ -6,6 +6,7 @@
 #define USELIBCURL_PUTREQUEST_H
 
 #include "request.h"
+#include <string.h>
 
 class HttpPutJsonRequest : public HttpRequest<HttpPutJsonRequest>
 {

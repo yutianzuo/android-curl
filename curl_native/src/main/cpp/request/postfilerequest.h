@@ -78,7 +78,7 @@ public:
                 m_file.seekg(0, std::ios::seekdir::end);
                 m_filesize = m_file.tellg();
                 m_uploadsize = 0;
-                m_file.seekg(std::ios::seekdir::beg);
+                m_file.seekg(0);
                 curl_mime_data_cb(part, m_filesize, readfunc, nullptr, nullptr, this);
                 curl_mime_type(part, "application/octet-stream");
             }

@@ -5,8 +5,9 @@
 
 #include "android_utils.h"
 #include <signal.h>
-#include <fstream>
-
+#include <string>
+#include <string.h>
+#include <fcntl.h>
 static JavaVM *g_jvm;
 
 class JNIEnvPtr {
@@ -45,15 +46,7 @@ static
 void android_sigaction(int signal, siginfo_t *info, void *reserved)
 {
     LOGE("catch native crash, signal:%d", signal);
-//    JNIEnvPtr env_ptr;
-
-    std::ofstream out(g_path);
-    if (out) {
-//        out.write("123", 3);
-        out.close();
-    } else {
-        LOGE("create file failed");
-    }
+    ::open(g_path.data(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
     old_sa[signal].sa_handler(signal);
 }
 
@@ -86,7 +79,7 @@ Java_com_github_yutianzuo_native_1crash_1handler_NativeCrashHandler_installNativ
     struct sigaction handler;
     memset(&handler, 0, sizeof(struct sigaction));
     handler.sa_sigaction = android_sigaction;
-    handler.sa_flags = SA_RESETHAND;
+    handler.sa_flags = SA_RESETHAND | SA_SIGINFO;
 
 #define CATCHSIG(X) sigaction(X, &handler, &old_sa[X])
     int ret = CATCHSIG(SIGILL);
