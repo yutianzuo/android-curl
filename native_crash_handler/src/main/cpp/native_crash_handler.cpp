@@ -47,7 +47,9 @@ void android_sigaction(int signal, siginfo_t *info, void *reserved)
 {
     LOGE("catch native crash, signal:%d", signal);
     ::open(g_path.data(), O_RDWR | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP);
-    old_sa[signal].sa_handler(signal);
+    if (old_sa[signal].sa_sigaction) {
+        old_sa[signal].sa_sigaction(signal, info, reserved);
+    }
 }
 
 JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *jvm, void *reserved)
