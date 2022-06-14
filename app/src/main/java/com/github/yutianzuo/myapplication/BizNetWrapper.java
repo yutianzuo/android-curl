@@ -15,6 +15,7 @@ public enum BizNetWrapper {
     RequestManager mRequest1;
     RequestManager mRequest2;
     RequestManager mRequest3;
+    RequestManager mRequest4;
 
 
     public void init(Context context) {
@@ -27,6 +28,7 @@ public enum BizNetWrapper {
         mRequest1 = null;
         mRequest2 = null;
         mRequest3 = null;
+        mRequest4 = null;
     }
 
     public RequestManager getBizRequestManager20(Context context) {
@@ -40,18 +42,18 @@ public enum BizNetWrapper {
     }
 
     public RequestManager getBizRequestManager(Context context) {
-        if (mRequest1 == null) {
-            mRequest1 = HttpManager.INSTANCE.getRequest();
+        if (mRequest4 == null) {
+            mRequest4 = HttpManager.INSTANCE.getRequest();
 //            mRequest1.setHost("https://sha1.badssl.com"); //an example : ca not valid
-            mRequest1.setHost("https://example.com");
-            mRequest1.addBasicHeader("MyCookie", "123456789");
-            mRequest1.addBasicHeader("MyCookie2", "123456789123456");
-            mRequest1.addBasicUrlParams("param1", "value");
-            mRequest1.addBasicUrlParams("param2", "value");
-            mRequest1.setCertPath(Misc.getAppDir(context) + Misc.CERT_NAME);
-//            mRequest1.setProxy("http://172.18.100.56:8888"); //for debug
+            mRequest4.setHost("https://example.com");
+            mRequest4.addBasicHeader("MyCookie", "123456789");
+            mRequest4.addBasicHeader("MyCookie2", "123456789123456");
+            mRequest4.addBasicUrlParams("param1", "value");
+            mRequest4.addBasicUrlParams("param2", "value");
+            mRequest4.setCertPath(Misc.getAppDir(context) + Misc.CERT_NAME);
+//            mRequest4.setProxy("http://172.18.100.56:8888"); //for debug
         }
-        return mRequest1;
+        return mRequest4;
     }
 
     public RequestManager getBizRequestManager2(Context context) {
