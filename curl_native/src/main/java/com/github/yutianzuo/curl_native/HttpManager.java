@@ -43,7 +43,7 @@ public enum HttpManager {
     }
 
     /**
-     * jni callback, dont proguard
+     * jni callback, need proguard
      * callback invoke in mainthread
      */
     public void callBack(int type, final byte[] strResponse, final float persent, int seq,
