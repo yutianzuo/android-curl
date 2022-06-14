@@ -10,9 +10,9 @@
 #include "../tools/timeutils.h"
 
 
-typedef void(*CallBackFunc)(int, const std::string &, float, size_t, int, void *);
+/// typedef void(*CallBackFunc)(int, const std::string &, float, size_t, int, void *);
 
-template<typename Derive, typename CallBack = CallBackFunc>
+template<typename Derive>
 class HttpRequest
 {
 public:
@@ -62,7 +62,7 @@ protected:
         }
     }
 
-    CallBack m_callback = nullptr;
+    std::function<void(int, const std::string &, float, size_t, int, void *)> m_callback;
 
     size_t m_request_seq;
 
@@ -81,6 +81,7 @@ public:
         RESULT_TYPE_SUCCEES_ALL = 0,
         RESULT_TYPE_SUCCEES_DOWNLOAD_PROGRESS = 1,
         RESULT_TYPE_SUCCEES_UPLOAD_PROGRESS = 2,
+        RESULT_TYPE_GET_DATA_PROGRESS = 3,
     };
 
 
@@ -114,6 +115,14 @@ public:
             curl_easy_reset(m_curl_handle);
         }
         m_url_reuse_time = TimeUtils::get_current_time();
+    }
+
+    void interrupt()
+    {
+        if (m_curl_handle)
+        {
+            curl_easy_setopt(m_curl_handle, CURLOPT_TIMEOUT_MS, 1);
+        }
     }
 
     void set_url(const std::string &str_url, bool skip_ssl = false)
@@ -215,12 +224,11 @@ public:
 
     }
 
-
-    void set_callback(CallBack call_back)
+    template<typename T>
+    void set_callback(T&& call_back)
     {
-        m_callback = call_back;
+        m_callback = std::forward<T>(call_back);
     }
-
 
     void go() const
     {

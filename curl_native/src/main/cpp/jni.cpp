@@ -58,14 +58,13 @@ static void GlobalCallBackFunc(int result, const std::string &respones, float pe
 
     if (g_obj) {
         jclass clazz = jnienv_holder->GetObjectClass(g_obj);
-        jmethodID method = jnienv_holder->GetMethodID(clazz, "callBack", "(ILjava/lang/String;FII)V");
-        jstring jrespones = nullptr;
-        try {
-            jrespones = jnienv_holder->NewStringUTF(respones.c_str());
-        } catch (...) {
+        jmethodID method = jnienv_holder->GetMethodID(clazz, "callBack", "(I[BFII)V");
 
-        }
-        jnienv_holder->CallVoidMethod(g_obj, method, result, jrespones, persent, seq, errcode);
+        jbyteArray arr = jnienv_holder->NewByteArray(respones.size());
+        jnienv_holder->SetByteArrayRegion(arr, 0, respones.size(), (jbyte*)respones.c_str());
+
+        jnienv_holder->CallVoidMethod(g_obj, method, result, arr, persent, seq, errcode);
+        jnienv_holder->DeleteLocalRef(arr);
     }
 
 

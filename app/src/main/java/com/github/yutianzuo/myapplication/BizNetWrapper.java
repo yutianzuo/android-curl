@@ -32,7 +32,7 @@ public enum BizNetWrapper {
     public RequestManager getBizRequestManager20(Context context) {
         if (mRequest1 == null) {
             mRequest1 = HttpManager.INSTANCE.getRequest();
-            mRequest1.setHost("http://nghttp2.org");
+            mRequest1.setHost("https://nghttp2.org");
             mRequest1.setCertPath(Misc.getAppDir(context) + Misc.CERT_NAME);
 //            mRequest1.setProxy("http://172.18.100.56:8888"); //for debug
         }

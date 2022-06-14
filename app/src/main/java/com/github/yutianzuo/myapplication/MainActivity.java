@@ -116,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public void success(BeanTest data) {
                         mTextView.setText("Get TestCase OK");
-                        //Log.e("JAVA_TAG", data.rep);
+                        Log.e("JAVA_TAG", data.rep);
                     }
 
                     @Override

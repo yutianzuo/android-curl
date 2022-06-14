@@ -8,6 +8,7 @@ import android.util.SparseArray;
 import com.github.yutianzuo.curl_native.utils.Misc;
 import com.github.yutianzuo.curl_native.utils.ThreadHelper;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,10 +46,11 @@ public enum HttpManager {
      * jni callback, dont proguard
      * callback invoke in mainthread
      */
-    public void callBack(int type, final String strResponse, final float persent, int seq, final int errcode) {
+    public void callBack(int type, final byte[] strResponse, final float persent, int seq,
+            final int errcode) {
         //Log.e("JAVA_TAG", strResponse);
         final HttpCallback callback = mCallbackMap.get(seq);
-        final String strResponse_safe = strResponse == null ? "" : strResponse;
+        final String strResponse_safe = strResponse == null ? "" : new String(strResponse, Charset.defaultCharset());
         if (callback != null) {
             if (type == RESULT_FAILED) {
                 ThreadHelper.runOnUiThread(new Runnable() {
