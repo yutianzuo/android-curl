@@ -16,8 +16,7 @@ android {
                 //aar better not use dynamic stl library:https://android.googlesource.com/platform/ndk/+/refs/heads/master/docs/user/middleware_vendors.md
                 //by default cmake use static stl library
                 //arguments = ["-DANDROID_STL=c++_shared"]
-//                abiFilters 'armeabi-v7a', 'x86', 'arm64-v8a'
-                abiFilters 'arm64-v8a', 'x86_64' //only build arm
+                abiFilters 'arm64-v8a', 'x86_64' //only 64bit
             }
         }
     }
