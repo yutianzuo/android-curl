@@ -79,6 +79,10 @@ JNIEXPORT void JNICALL
 Java_com_github_yutianzuo_curl_1native_JniCurl_init(JNIEnv *env, jclass type, jint threadPoolSize,
                                                     jobject callBack) {
     HttpManager::init(threadPoolSize);
+#ifdef ENABLE_LOG
+    char* version = curl_version();
+    LOGD("curl version is : %s", version);
+#endif
     if (callBack) {
         if (g_obj) {
             env->DeleteGlobalRef(g_obj);
