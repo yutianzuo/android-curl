@@ -47,7 +47,7 @@ jint JNI_OnLoad(JavaVM *vm, void *reserved) {
 
 static void GlobalCallBackFunc(int result, const std::string &respones, float persent, size_t seq,
                                int errcode, void *extra) {
-    LOGE("%s", respones.c_str());
+//    LOGE("%s", respones.c_str());
 
     JNIEnvPtr jnienv_holder;
 
