@@ -8,6 +8,7 @@
 #include "curl.h"
 #include <string>
 #include "../tools/timeutils.h"
+#include "../android_utils.h"
 
 
 /// typedef void(*CallBackFunc)(int, const std::string &, float, size_t, int, void *);
@@ -173,13 +174,13 @@ public:
 
     static int debug_callback(CURL *curl, curl_infotype type, char *data, size_t size, void *userptr)
     {
-        if (type == CURLINFO_TEXT || type == CURLINFO_HEADER_IN || type == CURLINFO_HEADER_OUT)
+        if (type == CURLINFO_HEADER_IN || type == CURLINFO_HEADER_OUT)
         {
             if (data != NULL && size > 0 && data[size - 1] == '\n')
             {
                 size = size - 1;
             }
-            std::cout << "libcurl: " << std::string(data, size);
+            LOGD("debug header: --%d--  %s", type, data);
         }
         return 0;
 }
