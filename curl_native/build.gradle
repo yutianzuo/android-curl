@@ -16,7 +16,7 @@ android {
                 //aar better not use dynamic stl library:https://android.googlesource.com/platform/ndk/+/refs/heads/master/docs/user/middleware_vendors.md
                 //by default cmake use static stl library
                 //arguments = ["-DANDROID_STL=c++_shared"]
-                abiFilters 'arm64-v8a', 'x86_64' //only 64bit
+                abiFilters 'arm64-v8a', 'x86_64', 'armeabi-v7a'
             }
         }
     }
@@ -27,7 +27,7 @@ android {
             externalNativeBuild {
                 cmake {
                     cppFlags "-fvisibility=hidden", "-fno-unwind-tables", "-fno-asynchronous-unwind-tables"
-                    arguments "-DCMAKE_BUILD_TYPE=Release"
+                    arguments "-DCMAKE_BUILD_TYPE=Release", "-DANDROID_PLATFORM=android-21"
                 }
             }
         }
@@ -35,7 +35,8 @@ android {
             debuggable false
             externalNativeBuild {
                 cmake {
-                    arguments "-DCMAKE_BUILD_TYPE=Debug"
+                    cppFlags "-fvisibility=hidden", "-fno-unwind-tables", "-fno-asynchronous-unwind-tables"
+                    arguments "-DCMAKE_BUILD_TYPE=Debug", "-DANDROID_PLATFORM=android-21"
                 }
             }
         }
