@@ -9,6 +9,7 @@
 #include <string>
 #include "../tools/timeutils.h"
 #include "../android_utils.h"
+#include "mbedtls/ssl.h"
 
 
 /// typedef void(*CallBackFunc)(int, const std::string &, float, size_t, int, void *);
@@ -155,7 +156,7 @@ public:
         curl_easy_setopt(m_curl_handle, CURLOPT_CONNECTTIMEOUT, 10); // set transport and time out time
         curl_easy_setopt(m_curl_handle, CURLOPT_TIMEOUT, 15);
         curl_easy_setopt(m_curl_handle, CURLOPT_WRITEFUNCTION, write_callback);
-        curl_easy_setopt(m_curl_handle, CURLOPT_WRITEDATA, (void *) &m_buffer);
+        curl_easy_setopt(m_curl_handle, CURLOPT_WRITEDATA, (void *) this);
         curl_easy_setopt(m_curl_handle, CURLOPT_AUTOREFERER, 1);
         curl_easy_setopt(m_curl_handle, CURLOPT_FOLLOWLOCATION, 1L); //follow location. e.g. 301/302/203
         curl_easy_setopt(m_curl_handle, CURLOPT_POSTREDIR, CURL_REDIR_POST_ALL); // 301 302 303 post won't switch to get
@@ -171,20 +172,22 @@ public:
     }
 
 #ifdef CURL_DEBUG
-
     static int debug_callback(CURL *curl, curl_infotype type, char *data, size_t size, void *userptr)
     {
-        if (type == CURLINFO_HEADER_IN || type == CURLINFO_HEADER_OUT)
-        {
-            if (data != NULL && size > 0 && data[size - 1] == '\n')
-            {
+        if (type == CURLINFO_HEADER_IN || type == CURLINFO_HEADER_OUT) {
+            if (data != NULL && size > 0 && data[size - 1] == '\n') {
                 size = size - 1;
             }
             LOGD("debug header: --%d--  %s", type, data);
         }
-        return 0;
-}
 
+
+        if (type == CURLINFO_SSL_DATA_OUT || type == CURLINFO_SSL_DATA_IN) {
+            LOGD("type == CURLINFO_SSL_DATA_OUT || type == CURLINFO_SSL_DATA_IN : %d", type);
+        }
+
+        return 0;
+    }
 #endif
 
     void set_proxy(const std::string& str_proxy)
@@ -264,7 +267,49 @@ public:
 
     static size_t write_callback(void *ptr, size_t size, size_t nmemb, void *stream)
     {
-        std::string *str = (std::string *) stream;
+        HttpRequest* pThis = static_cast<HttpRequest*>(stream);
+
+#ifdef CURL_DEBUG
+        const struct curl_tlssessioninfo *info = nullptr;
+        CURLcode res = curl_easy_getinfo(pThis->m_curl_handle, CURLINFO_TLS_SSL_PTR, &info);
+        if(info && !res) {
+            if (info->backend == CURLSSLBACKEND_MBEDTLS && info->internals) {
+                mbedtls_ssl_context* mbedtls_config_context = static_cast<mbedtls_ssl_context*>
+                (info->internals);
+                {
+                    const char *result = mbedtls_ssl_get_version(mbedtls_config_context);
+                    if (result) {
+                        LOGD("mbedtls ssl version result: %s", result);
+                    }
+                }
+                {
+                    const char *result = mbedtls_ssl_get_alpn_protocol(mbedtls_config_context);
+                    if (result) {
+                        LOGD("mbedtls alpn result: %s", result);
+                    }
+                }
+                {
+                    const char *result = mbedtls_ssl_get_ciphersuite(mbedtls_config_context);
+                    if (result) {
+                        LOGD("mbedtls ciphersuite result: %s", result);
+                    }
+                }
+                {
+                    const char *result = mbedtls_ssl_get_ciphersuite_name
+                            (mbedtls_ssl_get_ciphersuite_id_from_ssl(mbedtls_config_context));
+                    if (result) {
+                        LOGD("mbedtls ciphersuite name result: %s", result);
+                    }
+                }
+                {
+                    int result = mbedtls_ssl_get_version_number(mbedtls_config_context);
+                    LOGD("mbedtls version_number result: %d", result);
+                }
+            }
+        }
+#endif
+
+        std::string *str = &(pThis->m_buffer);
         (*str).append((char *) ptr, size * nmemb);
         return size * nmemb;
     }
